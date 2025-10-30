@@ -1,5 +1,17 @@
 # Implementation for the paper "Multivariate Dependencies in Multiplex Graphs: Theory and Estimation" by Skeja and Olhede (Skeja and Olhede, 2024)
 
+## Overview
+This implementation estimates and quantifies **multivariate dependencies in multiplex graphs** as developed by *Skeja and Olhede (2024)*.  
+The estimation now operates **directly at the level of the probability cells**, using the latent blockmodel inference procedure of `NetworkHistogram.jl`.
+
+The workflow is as follows:
+1. Load or generate multiplex adjacency matrices.
+2. Estimate the blockmodel using `NetworkHistogram.jl`.
+3. Build probability-cell tensors directly from the estimator output.
+4. Compute information measures over all node pairs.
+
+---
+
 ## Run information measures on your own adjacency matrices (A1.csv, A2.csv, A3.csv)
 ```julia
 using DelimitedFiles, LinearAlgebra, Random
@@ -22,56 +34,36 @@ same_size(As...) = begin
 end
 
 A1 = symmetrize01(load_csv("A1.csv"))
-
 A2 = symmetrize01(load_csv("A2.csv"))
-
 A3 = symmetrize01(load_csv("A3.csv"))
-
 n  = same_size(A1, A2, A3)
-```
-## Blockmodel approximation 
-```julia
-### Acknowledgments
-This step relies on `NetworkHistogram.jl` (Dufour and Grainger, 2023), using the implementation of Dufour and Olhede (2024).
 
-out = graphhist(cat(A1, A2, A3, dims=3);
+
+#Blockmodel approximation
+### Acknowledgments
+This step relies on `NetworkHistogram.jl` (Dufour and Grainger, 2023), using the inference implementation of Dufour and Olhede (2024).
+
+using NetworkHistogram
+
+estimator, history = graphhist(cat(A1, A2, A3, dims=3);
       starting_assignment_rule = OrderedStart(),
       maxitr = 1_000_000,
       stop_rule = PreviousBestValue(100))
 
-    
-est = out.graphhist
+# Construct the probability-cell tensor directly from the fitted estimator.
+# Each slice Pcells[:, :, ℓ] corresponds to one of the 2^d (here 8) joint edge configurations.
+Pcells = build_Pcells(estimator)
 
-p   = NetworkHistogram.get_moment_representation(est)[1]
+#Compute graphon information measures
 
-p_1, p_2, p_12 = p[:, :, 1], p[:, :, 2], p[:, :, 3]
+tri, mi_12, mi_23, mi_13, cmi_12_3, cmi_13_2, cmi_23_1 =
+    info_measures_from_cells(n, Pcells)
 
-p_3, p_13, p_23, p_123 = p[:, :, 4], p[:, :, 5], p[:, :, 6], p[:, :, 7]
-```
+println("I(1;2;3)   = ", tri)
+println("I(1;2)     = ", mi_12)
+println("I(2;3)     = ", mi_23)
+println("I(1;3)     = ", mi_13)
+println("I(1;2 | 3) = ", cmi_12_3)
+println("I(1;3 | 2) = ", cmi_13_2)
+println("I(2;3 | 1) = ", cmi_23_1)
 
-## Compute graphon information measures; see multiplex_info.jl
-
-```julia
-
-I123, I12, I23, I13, I12_3, I13_2, I23_1 =
-    graphon_info_measures(n, est, p_1, p_2, p_3, p_12, p_13, p_23, p_123)
-```
-## Print results
-
-```julia
-
-println("I(1;2;3)   = ", I123)
-println("I(1;2)     = ", I12)
-println("I(2;3)     = ", I23)
-println("I(1;3)     = ", I13)
-println("I(1;2 | 3) = ", I12_3)
-println("I(1;3 | 2) = ", I13_2)
-println("I(2;3 | 1) = ", I23_1)
-```
-
-## References
- Skeja, A., and Olhede, S. C. (2024). Quantifying multivariate graph dependencies: Theory and estimation for multiplex graphs. arXiv preprint arXiv:2405.14482.
- 
- Dufour, C., and Olhede, S. C. (2024). Inference for decorated graphs and application to multiplex networks. arXiv preprint arXiv:2408.12339.
- 
- Dufour, C., and Grainger, J. (2023). NetworkHistogram.jl (v0.5.1). Zenodo. https://doi.org/10.5281/zenodo.10212852
