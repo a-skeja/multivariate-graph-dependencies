@@ -6,7 +6,7 @@ The estimation now operates **directly at the level of the probability cells**, 
 
 ---
 
-## Run information measures on your own adjacency matrices (A1.csv, A2.csv, A3.csv)
+## Run information measures on your own adjacency matrices 
 ```julia
 using DelimitedFiles, LinearAlgebra, Random
 include("multiplex_info.jl")       
@@ -36,7 +36,7 @@ n  = same_size(A1, A2, A3)
 ## Blockmodel approximation
 
 #This step relies on `NetworkHistogram.jl` (Dufour and Grainger, 2023), using the inference implementation of Dufour and Olhede (2024).
-
+```julia
 using NetworkHistogram
 
 estimator, history = graphhist(cat(A1, A2, A3, dims=3);
@@ -49,7 +49,7 @@ estimator, history = graphhist(cat(A1, A2, A3, dims=3);
 Pcells = build_Pcells(estimator)
 
 ## Compute graphon information measures
-
+```julia
 tri, mi_12, mi_23, mi_13, cmi_12_3, cmi_13_2, cmi_23_1 =
     info_measures_from_cells(n, Pcells)
 
