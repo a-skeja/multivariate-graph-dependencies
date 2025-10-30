@@ -4,12 +4,6 @@
 This implementation estimates and quantifies **multivariate dependencies in multiplex graphs** as developed by *Skeja and Olhede (2024)*.  
 The estimation now operates **directly at the level of the probability cells**, using the latent blockmodel inference procedure of `NetworkHistogram.jl`.
 
-The workflow is as follows:
-1. Load or generate multiplex adjacency matrices.
-2. Estimate the blockmodel using `NetworkHistogram.jl`.
-3. Build probability-cell tensors directly from the estimator output.
-4. Compute information measures over all node pairs.
-
 ---
 
 ## Run information measures on your own adjacency matrices (A1.csv, A2.csv, A3.csv)
