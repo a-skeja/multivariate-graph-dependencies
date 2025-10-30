@@ -31,6 +31,7 @@ A1 = symmetrize01(load_csv("A1.csv"))
 A2 = symmetrize01(load_csv("A2.csv"))
 A3 = symmetrize01(load_csv("A3.csv"))
 n  = same_size(A1, A2, A3)
+```
 
 
 ## Blockmodel approximation
@@ -47,6 +48,7 @@ estimator, history = graphhist(cat(A1, A2, A3, dims=3);
 # Construct the probability-cell tensor directly from the fitted estimator.
 # Each slice Pcells[:, :, ℓ] corresponds to one of the 2^d (here 8) joint edge configurations.
 Pcells = build_Pcells(estimator)
+```
 
 ## Compute graphon information measures
 ```julia
@@ -60,4 +62,5 @@ println("I(1;3)     = ", mi_13)
 println("I(1;2 | 3) = ", cmi_12_3)
 println("I(1;3 | 2) = ", cmi_13_2)
 println("I(2;3 | 1) = ", cmi_23_1)
+```
 
