@@ -33,7 +33,7 @@ A3 = symmetrize01(load_csv("A3.csv"))
 n  = same_size(A1, A2, A3)
 
 
-#Blockmodel approximation
+##Blockmodel approximation
 ### Acknowledgments
 This step relies on `NetworkHistogram.jl` (Dufour and Grainger, 2023), using the inference implementation of Dufour and Olhede (2024).
 
@@ -48,7 +48,7 @@ estimator, history = graphhist(cat(A1, A2, A3, dims=3);
 # Each slice Pcells[:, :, ℓ] corresponds to one of the 2^d (here 8) joint edge configurations.
 Pcells = build_Pcells(estimator)
 
-#Compute graphon information measures
+##Compute graphon information measures
 
 tri, mi_12, mi_23, mi_13, cmi_12_3, cmi_13_2, cmi_23_1 =
     info_measures_from_cells(n, Pcells)
