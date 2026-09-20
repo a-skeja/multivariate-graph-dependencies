@@ -36,7 +36,7 @@ n  = same_size(A1, A2, A3)
 
 ## Blockmodel approximation
 
-#This step relies on `NetworkHistogram.jl` (Dufour and Grainger, 2023), using the inference implementation of Dufour and Olhede (2024).
+#This step relies on `NetworkHistogram.jl` (Dufour and Grainger, 2023), using the greedy label-switching procedure described by Dufour and Olhede (2024).
 ```julia
 using NetworkHistogram
 
@@ -52,9 +52,7 @@ Pcells = build_Pcells(estimator)
 
 ## Compute graphon information measures
 ```julia
-tri, mi_12, mi_23, mi_13, cmi_12_3, cmi_13_2, cmi_23_1 =
-    info_measures_from_cells(n, Pcells)
-
+tri, mi_12, mi_23, mi_13, cmi_12_3, cmi_13_2, cmi_23_1 =info_measures_from_cells(size(Pcells, 1), Pcells)
 println("I(1;2;3)   = ", tri)
 println("I(1;2)     = ", mi_12)
 println("I(2;3)     = ", mi_23)
